@@ -1,0 +1,20 @@
+{
+  "name": "PredicateJS",
+  "version": "1.0.0",
+  "description": "JS Module for Robust Predicate Creation",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "predicate",
+    "validator",
+    "functional",
+    "javascript",
+    "js",
+    "module",
+    "testing"
+  ],
+  "author": "Derek Severson",
+  "license": "MIT"
+}
