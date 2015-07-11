@@ -9,7 +9,7 @@
     module.exports = factory(require('lodash'));
   } else {
     // Browser globals (root is window)
-    root.returnExports = factory(root._);
+    root.Predicate = factory(root._);
   }
 }(this, function (_) {
   
