@@ -8,7 +8,7 @@
     "url": "https://github.com/DerekSeverson/PredicateJS.git"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "gulp test"
   },
   "keywords": [
     "predicate",
@@ -25,8 +25,9 @@
     "lodash": "^3.10.0"
   },
   "devDependencies": {
+    "chai": "*",
     "gulp": "^3.9.0",
     "gulp-mocha": "^2.1.2",
-    "mocha": "^2.2.5"
+    "mocha": "*"
   }
 }
