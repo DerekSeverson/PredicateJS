@@ -10,14 +10,44 @@ var Predicate = require('../index.js');
 
 describe('Predicate Tests', function () {
 
-  describe('Module', function () {
+  describe('Predicate Module', function () {
+
     it('can be required via CommonJS', function () {
       expect(Predicate).to.exist;
     });
 
     it('is a function', function () {
-      assert(_.isFunction(Predicate), 'Predicate is a function');
+      expect(Predicate).to.be.a('function');
     });
+
+  });
+
+  describe('Instance Interface', function () {
+
+    var predicate;
+    beforeEach('create Predicate instance', function () {
+      predicate = Predicate();
+    });
+
+    it ('does not use prototypes', function () {
+      expect(Predicate.prototype)
+        .not.to.have.any.keys('passes', 'fails', 'ensure', 'determine');
+    });
+
+    describe('Methods:', function () {
+      _.each([
+        'passes',
+        'fails',
+        'ensure',
+        'determine'
+      ], function (methodName) {
+        it (methodName, function () {
+          expect(predicate[methodName]).to.be.a('function');
+        });
+      });
+    });
+
+
   });
 
   describe('Basic Predicates', function () {
@@ -98,113 +128,134 @@ describe('Predicate Tests', function () {
     });
   });
 
-  describe('Medium Complexity', function () {
+
+  describe('Deep Predicates', function () {
+
+    var objToTest;
+    var predicateThatPasses;
+    var predicateThatFails;
+
+    beforeEach('init object to test', function () {
+      objToTest = {
+        'data': {
+          'number': 3.2,
+          'empty': [],
+          'dog': 'yorky',
+          'more': {
+            'isTrue': true,
+            'isFalse': false
+          },
+          'deep': {
+            'deeper': {
+              'deepest': 'gold'
+            }
+          }
+        },
+				'list': [
+					'football',
+					'baseball',
+					'beachball'
+				]
+      };
+
+      predicateThatPasses = Predicate([_.isObject, {
+        'data': {
+          'number': _.isNumber,
+          'empty': _.isEmpty,
+          'dog': isEqualTo('yorky'),
+          'more': [_.isObject, {
+            '[]': _.isBoolean,
+            'isTrue': isEqualTo(true),
+            'isFalse': isEqualTo(false)
+          }],
+          'deep.deeper.deepest': isEqualTo('gold')
+        },
+        'list': [_.isArray, {
+          '[]': _.isString,
+          '0': isEqualTo('football')
+        }]
+      }]);
+
+      predicateThatFails = Predicate([_.isObject, {
+        'data': {
+          'number': _.isNumber,
+          'empty': _.isEmpty,
+          'dog': isEqualTo('yorky'),
+          'more': [_.isObject, {
+            '[]': _.isBoolean,
+            'isTrue': isEqualTo(false),
+            'isFalse': isEqualTo(false)
+          }],
+          'deep.deeper.deepest': isEqualTo('silver')
+        },
+        'list': [_.isArray, {
+          '[]': _.isString,
+          '0': isEqualTo('football')
+        }]
+      }]);
+    });
+
     describe('Method: passes', function () {
 
-      it('returns false', function () {
-
-        var predicate = Predicate(isEqualTo('Hello!'));
-        var passes = predicate.passes('Goodbye!');
-
-        expect(passes).to.be.a('boolean');
-        expect(passes).to.be.false;
-      });
-
       it('returns true', function () {
-
-        var predicate = Predicate(isEqualTo('Hello!'));
-        var passes = predicate.passes('Hello!');
-
-        expect(passes).to.be.a('boolean');
-        expect(passes).to.be.true;
+        expect(
+          predicateThatPasses.passes(objToTest)
+        ).to.be.a('boolean').and.to.be.true;
       });
+
+      it('returns false', function () {
+        expect(
+          predicateThatFails.passes(objToTest)
+        ).to.be.a('boolean').and.to.be.false;
+      });
+
     });
 
     describe('Method: fails', function () {
 
       it('returns true', function () {
-
-        var predicate = Predicate(isEqualTo('Hello!'));
-        var fails = predicate.fails('Goodbye!');
-
-        expect(fails).to.be.a('boolean');
-        expect(fails).to.be.true;
+        expect(
+          predicateThatFails.fails(objToTest)
+        ).to.be.a('boolean').and.to.be.true;
       });
 
       it('returns false', function () {
-
-        var predicate = Predicate(isEqualTo('Hello!'));
-        var fails = predicate.fails('Hello!');
-
-        expect(fails).to.be.a('boolean');
-        expect(fails).to.be.false;
+        expect(
+          predicateThatPasses.fails(objToTest)
+        ).to.be.a('boolean').and.to.be.false;
       });
+
     });
 
     describe('Method: ensure', function () {
 
-      it ('throws an exception', function () {
+      it ('throws an error', function () {
         expect(function () {
-          var predicate = Predicate(isEqualTo('Hello!'));
-          predicate.ensure('Goodbye!');
+          predicateThatFails.ensure(objToTest);
         }).to.throw(/Predicate Failed/);
       });
 
       it ('nothing thrown, returns object passed in', function () {
-        expect(function () {
-          var predicate = Predicate(isEqualTo('Hello!'));
-          var result = predicate.ensure('Goodbye!');
-          expect(result).to.equal('Goodbye!');
-        });
+        expect(
+          predicateThatPasses.ensure(objToTest)
+        ).to.equal(objToTest);
       });
 
     });
-  });
 
-  describe('Deep Predicates', function () {
+    describe('Method: determine', function () {
 
-    it('method "passes" returns true', function () {
-
-      var predicate = Predicate([_.isObject, {
-        'date': _.isDate,
-        'number': _.isFinite,
-        'empty': _.isEmpty,
-        'dog': isEqualTo('yorky'),
-        'regex': _.isRegExp,
-        'more': [_.isObject, {
-          '[]': _.isBoolean,
-          'isTrue': isEqualTo(true),
-          'isFalse': isEqualTo(false)
-        }],
-        'list': [_.isArray, {
-          '[]': _.isString,
-          '0': isEqualTo('football'),
-        }]
-      }]);
-
-      expect(predicate.passes).to.be.a('function');
-
-      var passes = predicate.passes({
-        'data': {
-          'date': new Date(),
-          'number': 3.2,
-          'empty': [],
-          'dog': 'yorky',
-          'regex': /abc/,
-          'more': {
-            'isTrue': true,
-            'isFalse': false
-          },
-          'list': [
-            'football',
-            'baseball',
-            'beachball'
-          ]
-        }
+      it ('returns an error', function () {
+        expect(
+          predicateThatFails.determine(objToTest)
+        ).to.be.a('error');
       });
 
-      expect(passes).to.be.a('boolean');
-      expect(passes).to.be.true;
+      it ('returns object passed in', function () {
+        expect(
+          predicateThatPasses.determine(objToTest)
+        ).to.equal(objToTest);
+      });
 
     });
 
