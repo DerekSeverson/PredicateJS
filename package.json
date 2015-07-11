@@ -16,5 +16,8 @@
     "testing"
   ],
   "author": "Derek Severson",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "lodash": "^3.10.0"
+  }
 }
