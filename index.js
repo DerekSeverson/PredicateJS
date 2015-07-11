@@ -13,24 +13,6 @@
   }
 }(this, function (_) {
 
-  /**
-   * PredicateFailure Class/Constructor
-   *
-   * Collects failures when running Predicate
-   * Inherits from Error
-   */
-  function PredicateFailure(msg, failure) {
-    this.name = 'PredicateFailure';
-    this.message = (msg || 'Predicate Failed');
-    this.failure = (failure || 'Unknown');
-  }
-  PredicateFailure.prototype = Object.create(Error.prototype);
-  PredicateFailure.prototype.constructor = PredicateFailure;
-
-  // Static Methods on our Predicate Module
-  Predicate.PredicateFailure = PredicateFailure;
-  Predicate.isPredicateFailure = isPredicateFailure;
-
   return Predicate;
 
 
@@ -66,15 +48,17 @@
     that.ensure = function ensureTrueFor(obj) {
       return ensurePredicate(obj, config);
     };
-  }
 
-  function isPredicateFailure(err) {
-    return err instanceof PredicateFailure;
+    that.determine = function attemptToEnsurePredicate(obj) {
+      return _.attempt(ensurePredicate, obj, config);
+    };
+
+    return that;
   }
 
   function predicatePasses(obj, config) {
     var result = _.attempt(ensurePredicate, obj, config);
-    return (isPredicateFailure(result) || _.isError(result));
+    return !(_.isError(result));
   }
 
   // --------------------------------------------------
@@ -84,7 +68,7 @@
    * This is the Meat and Potatoes of the Predicate Class
    *
    * Returns obj if passes predicate
-   * Throws PredicateFailure if fails predicate
+   * Throws Error if fails predicate
    */
   function ensurePredicate(obj, config, path) {
     if (!_.isString(path)) path = '';
@@ -105,13 +89,13 @@
 		var predicateConfig = getPredicateConfig(configOrPredicate);
 
 		// Validation for the Current Object
-		if (_.exists(predicateFunction)) {
+		if (exists(predicateFunction)) {
 			predicateResult = tryPredicate(predicateFunction, objToTest, withKey);
 			processPredicateResult(predicateResult, path);
 		}
 
 		// Validation for the Current Object's Sub-Objects
-		if (_.exists(predicateConfig) && _.exists(objToTest)) {
+		if (exists(predicateConfig) && exists(objToTest)) {
 			_.each(predicateConfig, function (subObjConfigOrPredicate, subpathKey) {
 				ensurePredicate(rootObj, subObjConfigOrPredicate, concatPaths(path, subpathKey));
 			});
@@ -173,7 +157,7 @@
   function tryPredicate(predicationFunction, objToTest, withOptionalKey) {
     var isValid;
 
-    if (_.exists(withOptionalKey)) {
+    if (exists(withOptionalKey)) {
       isValid = _.attempt(predicationFunction, objToTest, withOptionalKey);
     } else {
       isValid = _.attempt(predicationFunction, objToTest);
@@ -184,9 +168,7 @@
 
   function processPredicateResult(result, path) {
     if (_.isError(result) || result === false) {
-      // false to give default message (could add custom messaging for each predicate tested)
-      // failure for now will just be the object path that failed.
-      throw new PredicateFailure(false, path);
+      throw new Error('Predicate Failed: ' + path);
     }
   }
 
@@ -204,12 +186,12 @@
   }
 
   function isArrayPathType(str) {
-    if (!_.isNonEmptyString(str)) return false;
+    if (!isNonEmptyString(str)) return false;
     return ('[]' === str.slice(-2)); // last two chars
   }
 
   function concatPaths(/* paths... */) {
-    return _.filter(_.toArray(arguments), _.isNonEmptyString).join('.');
+    return _.filter(_.toArray(arguments), isNonEmptyString).join('.');
   }
 
   function getObjAtPath(rootObj, path) {
