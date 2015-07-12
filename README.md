@@ -8,25 +8,30 @@ A Javascript Module for Robust Predicate Creation
 
 Let's just say the ```Predicate``` function takes in an argument called a "Predicate-Definition" (PD).
 
-Predicate-Definitions can be one of three things:
+##### Predicate-Definitions can be one of three things:
+
 > (Note: the 'test-object' terminology used below refers to the object passed into the methods: 'passes', fails', 'ensure', and 'determine').
+
 <dl>
-  <dt>1. Function</dt>
+  <dt><strong>1. Function</strong></dt>
   <dd>The function just gets called with the test-object passed in as its argument.</dd>
   <dd><strong>Usage</strong> - when wanting to test the object at hand (getting a true/false answer).</dd>
 
-  <dt>2. Object</dt>
+  <dt><strong>2. Object</strong></dt>
   <dd>The object's keys are used to traverse the test-object's properties to do deeper testing.  The values of the Predicate-Definition object passed in should also be Predicate-Definitions which are used to test against the corresponding keys of the test-object.</dd>
   <dd><strong>Usage</strong> - when wanting to test the properties of the object at hand.</dd>
 
-  <dt>3. Array</dt>
+  <dt><strong>3. Array</strong></dt>
   <dd>Passing in an Array is a combinition of options 1 & 2 in order to run a predicate on the test-object itself AND its properties.  The array gets two items. 1st item must be the predicate function called with the test-object (see #1 Function). 2nd item must be an Object Predicate Definition (see #2 Object) which traverse's the test-object's properties.</dd>
   <dd><strong>Usage</strong> - when wanting to test the object at hand AND its properties.</dd>
 </dl>
 
-Observations from the Definitions above:
+##### Observations from the Definitions above:
+
 1. Observe that PD type ```#3 Array``` is made up of both PD types ```#1 Function``` & ```#2 Object```.
+
 2. Observe that PD type ```#2 Object``` is made up of one or more PD types of ```#1 Function```.
+
 3. Observe that PD type ```#1 Function``` is the building block of creating a larger, more complex predicate function.
 
 Apologies for the terrible explanation above of how to use PredicateJS. Hopefully the examples will be of more use. Please offer suggestions on how to improve the wordage to make the documentation more comprehendable. Thanks!
