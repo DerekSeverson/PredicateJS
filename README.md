@@ -34,7 +34,7 @@ Let's just say the ```Predicate``` function takes in an argument called a "Predi
 
 3. Observe that PD type ```#1 Function``` is the building block of creating a larger, more complex predicate function.
 
-Apologies for the terrible explanation above of how to use PredicateJS. Hopefully the examples will be of more use. Please offer suggestions on how to improve the wordage to make the documentation more comprehendable. Thanks!
+> Apologies for the terrible explanation above of how to use PredicateJS. Hopefully the examples will be of more use. Please offer suggestions on how to improve the wordage to make the documentation more comprehendable. Thanks!
 
 ## Examples
 
@@ -43,30 +43,34 @@ Examples are the bee's knees ...
 ##### Quick Example of Methods
 ```javascript
 
-var pred = Predicate(_.isString);
+var foo = Predicate(_.isString);
 
 // 'passes'
-pred.passes('Hello, World!');    // => true
-pred.passes({});                 // => false
+foo.passes('Hello, World!');    // => true
+foo.passes({});                 // => false
 
 // 'fails'
-pred.fails('Hello, World!');     // => false
-pred.fails({});                  // => true
+foo.fails('Hello, World!');     // => false
+foo.fails({});                  // => true
 
 // 'ensure'
-pred.ensure('Hello, World!');    // => 'Hello, World!'
-pred.ensure({});                 // ** Error Thrown **
+foo.ensure('Hello, World!');    // => 'Hello, World!'
+foo.ensure({});                 // ** throws Error **
 
 // 'determine'
-pred.determine('Hello, World!'); // => 'Hello, World!'
-pred.determine({});              // => Error
+foo.determine('Hello, World!'); // => 'Hello, World!'
+foo.determine({});              // => Error
 
 ```
 
 ##### Creating Complex Predicates (... made easy!)
+
+Note: most callback function used in the examples below are from [lodash](https://lodash.com/docs)
+
 ```javascript
 
-// EX 1
+// ~~ Example 1 ~~
+
 var myBookCollection = [
   'Design Patterns',
   'Programming Pearls',
@@ -81,11 +85,12 @@ Predicate([_.isArray, {
   '2': function (thirdBook) { // basically, same as line above
     return 'Team Geek' === thirdBook;
   }
-}]).passing(myBookCollection);   // => true
+}]).passes(myBookCollection);   // => true
 
-// NOTE: '[]' is the syntax used to apply the callback to EACH value in the area
+// NOTE: '[]' is the syntax used to apply the callback to EACH value in an array or object (instead of a specific key/index)
+//       thus, _.isString callback is called with every item in the myBookCollection array.
 
-// EX 2
+// ~~ Example 2 ~~
 
 var wackyRandomObj = {
   'data': {
@@ -134,5 +139,11 @@ function isEqualTo(a) {
 }
 
 ```
+
+## Tests
+
+So far there's 23 Mocha BDD tests. Take a look at those to see more examples of how to use the Predicate Module and its methods!
+
+
 
 
