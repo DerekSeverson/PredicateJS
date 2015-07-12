@@ -132,11 +132,13 @@ Predicate([_.isObject, {
 }]).exists(wackyRandomObj);    // => just returns the wackyRandomObj (No Error Thrown)
 
 // high-order function used in example #2
-function isEqualTo(a) {
-  return function (b) {
-    return _.isEqual(a, b);
-  };
-}
+/**
+ *  function isEqualTo(a) {
+ *    return function (b) {
+ *      return _.isEqual(a, b);
+ *    };
+ *  }
+ */
 
 ```
 
